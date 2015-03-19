@@ -1,6 +1,15 @@
 module MetaMapper
   module DataMapperSupport
 
+    def self.extended(base)
+      DataMapper::Associations::ManyToOne::Relationship.class_eval do
+        alias_method :class_name, :child_model_name
+      end
+      DataMapper::Associations::OneToMany::Relationship.class_eval do
+        alias_method :class_name, :child_model_name
+      end
+    end
+
     def setup_orm_specific_fields 
       enums = {}
       model.properties.each do |prop|
@@ -23,7 +32,7 @@ module MetaMapper
     end
     
     def key_to_parent
-      many_to_one.inject({}) do |hash, (r,m)|
+      many_to_one.inject({}) do |hash, m|
         hash[m.child_key.first.name] = decolonize(m.parent_model_name.to_const_string)
         hash
       end
@@ -36,7 +45,7 @@ module MetaMapper
     end
     
     def get_key_to_parent(r)
-      r[1].child_key.first.name.to_s
+      r.child_key.first.name.to_s
     end
 
     def many_to_one
@@ -44,14 +53,7 @@ module MetaMapper
       @many_to_one ||= model.relationships.select {|m|
             m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'
       }
- 
-      #in case of ruby < 1.9
-      if Array === @many_to_one
-        temp = @many_to_one
-        @many_to_one = {}
-        temp.each{|t| @many_to_one[t.name] = t}
-      end 
-      @many_to_one.select!{|k,v| MetaMapper.has_class(v.parent_model_name)}
+      @many_to_one.select!{|v| MetaMapper.has_class(v.parent_model_name)}
       @many_to_one
     end
 
@@ -60,19 +62,12 @@ module MetaMapper
       @one_to_many ||= model.relationships.select {|m|
         m.class.name == 'DataMapper::Associations::OneToMany::Relationship'
       }
-
-      #in case of ruby < 1.9
-      if Array === @one_to_many
-        temp = @one_to_many
-        @one_to_many = {}
-        temp.each{|t| @one_to_many[t.name] = t}
-      end
-      @one_to_many.select!{|k,v| MetaMapper.has_class(v.child_model_name)}
+      @one_to_many.select!{|v| MetaMapper.has_class(v.child_model_name)}
       @one_to_many
     end
 
     def child_model_name(child)
-      child[1].child_model.to_s
+      child.child_model.to_s
     end
 
     # returns an enum in C
@@ -81,7 +76,7 @@ module MetaMapper
     end
 
     def primary_key(model)
-      model.key.first
+      model.key.first.name
     end
     
     def table_name(model)
@@ -90,11 +85,11 @@ module MetaMapper
 
     # the name my (many_to_one) child uses to refrence me : user_id
     def parent_name(r)
-      r[1].parent_model_name
+      r.parent_model_name
     end
 
-    def child_plural_name(m)
-      r[1].child_model.to_s
+    def child_plural_name(r)
+      r.name.to_s
     end
 
     def generated_properties
