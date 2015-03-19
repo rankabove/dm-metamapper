@@ -1,6 +1,15 @@
 module MetaMapper
   module DataMapperSupport
 
+    def self.extended(base)
+      DataMapper::Associations::ManyToOne::Relationship.class_eval do
+        alias_method :class_name, :child_model_name
+      end
+      DataMapper::Associations::OneToMany::Relationship.class_eval do
+        alias_method :class_name, :child_model_name
+      end
+    end
+
     def setup_orm_specific_fields 
       enums = {}
       model.properties.each do |prop|
