@@ -47,6 +47,8 @@ public:
                  const std::string& where);
 
     std::string now(); 
+    std::string today(); 
+    std::string days_ago(const int offset); 
 
     void startTransaction();
     void commitTransaction();

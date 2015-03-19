@@ -94,7 +94,7 @@ module MetaMapper
     end
 
     def decolonize(str)
-      str.sub(/::/,'')
+      str.sub(/::/,'_')
     end
 
     def generated_files
