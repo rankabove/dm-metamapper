@@ -76,7 +76,7 @@ module MetaMapper
     end
 
     def primary_key(model)
-      model.key.first
+      model.key.first.name
     end
     
     def table_name(model)
