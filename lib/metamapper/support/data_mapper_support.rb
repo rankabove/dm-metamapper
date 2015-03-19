@@ -93,7 +93,7 @@ module MetaMapper
       r[1].parent_model_name
     end
 
-    def child_plural_name(m)
+    def child_plural_name(r)
       r[1].child_model.to_s
     end
 
