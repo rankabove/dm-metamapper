@@ -89,7 +89,7 @@ module MetaMapper
     end
 
     def child_plural_name(r)
-      r.child_model.to_s
+      r.name.to_s
     end
 
     def generated_properties
