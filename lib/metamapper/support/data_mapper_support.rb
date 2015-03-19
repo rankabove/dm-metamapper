@@ -23,7 +23,7 @@ module MetaMapper
     end
     
     def key_to_parent
-      many_to_one.inject({}) do |hash, (r,m)|
+      many_to_one.inject({}) do |hash, m|
         hash[m.child_key.first.name] = decolonize(m.parent_model_name.to_const_string)
         hash
       end
@@ -36,7 +36,7 @@ module MetaMapper
     end
     
     def get_key_to_parent(r)
-      r[1].child_key.first.name.to_s
+      r.child_key.first.name.to_s
     end
 
     def many_to_one
@@ -58,7 +58,7 @@ module MetaMapper
     end
 
     def child_model_name(child)
-      child[1].child_model.to_s
+      child.child_model.to_s
     end
 
     # returns an enum in C
@@ -76,11 +76,11 @@ module MetaMapper
 
     # the name my (many_to_one) child uses to refrence me : user_id
     def parent_name(r)
-      r[1].parent_model_name
+      r.parent_model_name
     end
 
     def child_plural_name(r)
-      r[1].child_model.to_s
+      r.child_model.to_s
     end
 
     def generated_properties
